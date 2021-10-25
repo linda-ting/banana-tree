@@ -56,6 +56,10 @@ class Cylinder extends Drawable {
     this.generatePos();
     this.generateCol();
     this.generateTranslate();
+    this.generateTransform1();
+    this.generateTransform2();
+    this.generateTransform3();
+    this.generateTransform4();
 
     this.count = this.indices.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);

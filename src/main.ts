@@ -53,11 +53,6 @@ function loadLSystem() {
     let transform: mat4 = mat4.create();
     mat4.fromRotationTranslation(transform, turtle.orientation, turtle.position);
 
-    console.log(transform);
-    console.log(transform[0]);
-    console.log(transform[1]);
-    console.log(transform[15]);
-
     transformsArray1.push(transform[0], transform[1], transform[2], transform[3]);
     transformsArray2.push(transform[4], transform[5], transform[6], transform[7]);
     transformsArray3.push(transform[0], transform[1], transform[2], transform[3]);

@@ -67,6 +67,26 @@ abstract class Drawable {
     this.bufTranslate = gl.createBuffer();
   }
 
+  generateTransform1() {
+    this.transform1Generated = true;
+    this.bufTransform1 = gl.createBuffer();
+  }
+
+  generateTransform2() {
+    this.transform2Generated = true;
+    this.bufTransform2 = gl.createBuffer();
+  }
+
+  generateTransform3() {
+    this.transform3Generated = true;
+    this.bufTransform3 = gl.createBuffer();
+  }
+
+  generateTransform4() {
+    this.transform4Generated = true;
+    this.bufTransform4 = gl.createBuffer();
+  }
+
   generateUV() {
     this.uvGenerated = true;
     this.bufUV = gl.createBuffer();
