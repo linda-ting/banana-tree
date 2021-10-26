@@ -26,11 +26,10 @@ function loadLSystem() {
   // create geometry
   cylinder = new Cylinder();
   cylinder.create();
-  /*
   square = new Square();
   square.create();
   screenQuad = new ScreenQuad();
-  screenQuad.create();*/
+  screenQuad.create();
 
   // set up instanced rendering data arrays
   let n: number = 0;
@@ -38,7 +37,6 @@ function loadLSystem() {
   let transformsArray2: number[] = [];
   let transformsArray3: number[] = [];
   let transformsArray4: number[] = [];
-  let offsetsArray: number[] = [];
   let colorsArray: number[] = [];
 
   let numIter: number = 4;
@@ -120,17 +118,17 @@ function loadLSystem() {
     n++;
   }
 
+  console.log(n);
+  console.log(transformsArray1.length);
+
   let transforms1: Float32Array = new Float32Array(transformsArray1);
   let transforms2: Float32Array = new Float32Array(transformsArray2);
   let transforms3: Float32Array = new Float32Array(transformsArray3);
   let transforms4: Float32Array = new Float32Array(transformsArray4);
-  //let offsets: Float32Array = new Float32Array(offsetsArray);
   let colors: Float32Array = new Float32Array(transformsArray1);
 
   cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4, colors);
   cylinder.setNumInstances(n);
-  
-  console.log(transformsArray1);
 }
 
 function loadScene() {
@@ -160,10 +158,11 @@ function loadScene() {
     }
   }
 
+  /*
   let offsets: Float32Array = new Float32Array(offsetsArray);
   let colors: Float32Array = new Float32Array(colorsArray);
   square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // grid of "particles"
+  square.setNumInstances(n * n); // grid of "particles"*/
 }
 
 function main() {
@@ -218,9 +217,7 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     //renderer.render(camera, flat, [cylinder]);
-    renderer.render(camera, instancedShader, [
-      cylinder,
-    ]);
+    renderer.render(camera, instancedShader, [cylinder]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

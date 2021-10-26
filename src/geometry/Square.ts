@@ -8,7 +8,6 @@ class Square extends Drawable {
   colors: Float32Array;
   offsets: Float32Array; // Data for bufTranslate
 
-
   constructor() {
     super(); // Call the constructor of the super class. This is required.
   }

@@ -6,8 +6,7 @@ class Cylinder extends Drawable {
   indices: Uint32Array;
   positions: Float32Array;
   colors: Float32Array;
-  //offsets: Float32Array; // Data for bufTranslate
-  subdivisions: number = 4;
+  subdivisions: number = 3;
   radius: number = 1.0;
   height: number = 1.0;
   transform1: Float32Array;
@@ -28,8 +27,8 @@ class Cylinder extends Drawable {
       const x = this.radius * Math.cos(theta);
       const y = this.radius * Math.sin(theta);
 
-      positionsArray.push(x, y, 0);
-      positionsArray.push(x, y, this.height);
+      positionsArray.push(x, y, 0, 1);
+      positionsArray.push(x, y, this.height, 1);
 
       if (i == this.subdivisions - 1) {
         // if this is the last subdivision, link last face to first
@@ -43,19 +42,10 @@ class Cylinder extends Drawable {
 
     this.indices = new Uint32Array(indicesArray);
     this.positions = new Float32Array(positionsArray);
-
-  /*this.indices = new Uint32Array([0, 1, 2,
-                                  0, 2, 3]);
-  this.positions = new Float32Array([-0.5, -0.5, 0, 1,
-                                     0.5, -0.5, 0, 1,
-                                     0.5, 0.5, 0, 1,
-                                     -0.5, 0.5, 0, 1]);
-                                     */
-
+    
     this.generateIdx();
     this.generatePos();
     this.generateCol();
-    this.generateTranslate();
     this.generateTransform1();
     this.generateTransform2();
     this.generateTransform3();
@@ -73,16 +63,14 @@ class Cylinder extends Drawable {
 
   setInstanceVBOs(transform1: Float32Array, transform2: Float32Array, transform3: Float32Array, transform4: Float32Array, colors: Float32Array) {
     this.colors = colors;
-    //this.offsets = offsets;
     this.transform1 = transform1;
     this.transform2 = transform2;
     this.transform3 = transform3;
     this.transform4 = transform4;
 
+    // bind colors
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
     gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-    //gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
-    //gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
 
     // bind transformation matrix data
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform1);

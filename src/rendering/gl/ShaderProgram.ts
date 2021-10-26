@@ -165,8 +165,6 @@ class ShaderProgram {
       gl.vertexAttribDivisor(this.attrUV, 0); // Advance 1 index in pos VBO for each vertex
     }
 
-    // TODO: Set up attribute data for additional instanced rendering data as needed
-
     // set up attrib data for 4 columns of transformation matrix
     if (this.attrTransform1 != -1 && d.bindTransform1()) {
       gl.enableVertexAttribArray(this.attrTransform1);
