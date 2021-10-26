@@ -39,27 +39,30 @@ function loadLSystem() {
   let transformsArray4: number[] = [];
   let colorsArray: number[] = [];
 
-  let numIter: number = 4;
+  let numIter: number = 3;
   let axiom: string = "F";
 
   let expansionRules: Map<string, ExpansionRule> = new Map();
-  expansionRules.set("F", new ExpansionRule("F", "F+F"));
+  expansionRules.set("F", new ExpansionRule("F", "FF"));
   // TODO create & populate these rules
 
   let drawingRules: Map<string, DrawingRule> = new Map();
   drawingRules.set("F", new DrawingRule("F", cylinder, () => {
     let transform: mat4 = mat4.create();
-    mat4.fromRotationTranslation(transform, turtle.orientation, turtle.position);
+    let scale: vec3 = vec3.fromValues(1, 1, 1);
+    //mat4.fromRotationTranslation(transform, turtle.orientation, turtle.position);
+    mat4.fromRotationTranslationScale(transform, turtle.orientation, turtle.position, scale);
 
     transformsArray1.push(transform[0], transform[1], transform[2], transform[3]);
     transformsArray2.push(transform[4], transform[5], transform[6], transform[7]);
-    transformsArray3.push(transform[0], transform[1], transform[2], transform[3]);
-    transformsArray4.push(transform[0], transform[1], transform[2], transform[3]);
+    transformsArray3.push(transform[8], transform[9], transform[10], transform[11]);
+    transformsArray4.push(transform[12], transform[13], transform[14], transform[15]);
 
-    colorsArray.push(0.7);
-    colorsArray.push(0.7);
+    /*
     colorsArray.push(1.0);
     colorsArray.push(1.0);
+    colorsArray.push(1.0);
+    colorsArray.push(1.0);*/
   }));
   // TODO create & populate these rules
 
@@ -114,24 +117,22 @@ function loadLSystem() {
     let drawingRule = drawingRules.get(symbol);
     if (drawingRule == null) continue;
     drawingRule.draw();
-
     n++;
   }
-
-  console.log(n);
-  console.log(transformsArray1.length);
 
   let transforms1: Float32Array = new Float32Array(transformsArray1);
   let transforms2: Float32Array = new Float32Array(transformsArray2);
   let transforms3: Float32Array = new Float32Array(transformsArray3);
   let transforms4: Float32Array = new Float32Array(transformsArray4);
-  let colors: Float32Array = new Float32Array(transformsArray1);
+  //let colors: Float32Array = new Float32Array(colorsArray);
 
-  cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4, colors);
+  cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4);
   cylinder.setNumInstances(n);
 }
 
 function loadScene() {
+  cylinder = new Cylinder();
+  cylinder.create();
   square = new Square();
   square.create();
   screenQuad = new ScreenQuad();
@@ -158,11 +159,10 @@ function loadScene() {
     }
   }
 
-  /*
   let offsets: Float32Array = new Float32Array(offsetsArray);
   let colors: Float32Array = new Float32Array(colorsArray);
   square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // grid of "particles"*/
+  square.setNumInstances(n * n); // grid of "particles"
 }
 
 function main() {
@@ -191,7 +191,7 @@ function main() {
   //loadScene();
   loadLSystem();
 
-  const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(50, 50, 0));
+  const camera = new Camera(vec3.fromValues(10, 20, 10), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
@@ -216,7 +216,7 @@ function main() {
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    //renderer.render(camera, flat, [cylinder]);
+    //renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [cylinder]);
     stats.end();
 
