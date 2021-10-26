@@ -7,7 +7,7 @@ class Cylinder extends Drawable {
   positions: Float32Array;
   normals: Float32Array;
   colors: Float32Array;
-  subdivisions: number = 4;
+  subdivisions: number = 12;
   radius: number = 1.0;
   height: number = 1.0;
   transform1: Float32Array;
@@ -27,9 +27,9 @@ class Cylinder extends Drawable {
     for (var i = 0; i < this.subdivisions; i++) {
       const theta = i * 2.0 * Math.PI / this.subdivisions;
       const x = this.radius * Math.cos(theta);
-      const y = this.radius * Math.sin(theta);
-      positionsArray.push(x, y, 0, 1);
-      positionsArray.push(x, y, this.height, 1);
+      const z = this.radius * Math.sin(theta);
+      positionsArray.push(x, 0, z, 1);
+      positionsArray.push(x, -this.height, z, 1);
 
       var nextTheta;
       if (i == this.subdivisions - 1) {
@@ -38,36 +38,21 @@ class Cylinder extends Drawable {
         nextTheta = (i + 1) * 2.0 * Math.PI / this.subdivisions;
       }
       const nextX = this.radius * Math.cos(nextTheta);
-      const nextY = this.radius * Math.sin(nextTheta);
-      positionsArray.push(nextX, nextY, 0, 1);
-      positionsArray.push(nextX, nextY, this.height, 1);
+      const nextZ = this.radius * Math.sin(nextTheta);
+      positionsArray.push(nextX, 0, nextZ, 1);
+      positionsArray.push(nextX, -this.height, nextZ, 1);
 
       // calculate normals
       let normal: vec3 = vec3.create();
-      vec3.normalize(normal, vec3.fromValues((x + nextX) / 2.0, (y + nextY) / 2.0, 0));
-      normalsArray.push(normal[0], normal[1], 0, 0);
-      normalsArray.push(normal[0], normal[1], 0, 0);
-      normalsArray.push(normal[0], normal[1], 0, 0);
-      normalsArray.push(normal[0], normal[1], 0, 0);
+      vec3.normalize(normal, vec3.fromValues((x + nextX) / 2.0, 0, (z + nextZ) / 2.0));
+      normalsArray.push(normal[0], normal[1], normal[2], 0);
+      normalsArray.push(normal[0], normal[1], normal[2], 0);
+      normalsArray.push(normal[0], normal[1], normal[2], 0);
+      normalsArray.push(normal[0], normal[1], normal[2], 0);
 
       // write triangle indices
       indicesArray.push(4 * i, 4 * i + 3, 4 * i + 1);
       indicesArray.push(4 * i, 4 * i + 2, 4 * i + 3);
-
-      /*
-      let normal: vec3 = vec3.create();
-      vec3.normalize(normal, vec3.fromValues(x, y, 0));
-      normalsArray.push(normal[0], normal[1], 0);
-      normalsArray.push(normal[0], normal[1], 0);
-
-      if (i == this.subdivisions - 1) {
-        // if this is the last subdivision, link last face to first
-        indicesArray.push(2 * i, 2 * i + 1, 1);
-        indicesArray.push(2 * i, 0, 1);
-      } else {
-        indicesArray.push(2 * i, 2 * i + 1, 2 * i + 2);
-        indicesArray.push(2 * i, 2 * i + 2, 2 * i + 3);
-      }*/
     }
 
     this.indices = new Uint32Array(indicesArray);
@@ -77,7 +62,7 @@ class Cylinder extends Drawable {
     this.generateIdx();
     this.generatePos();
     this.generateNor();
-    this.generateCol();
+    //this.generateCol();
     this.generateTransform1();
     this.generateTransform2();
     this.generateTransform3();

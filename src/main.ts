@@ -37,32 +37,21 @@ function loadLSystem() {
   let transformsArray2: number[] = [];
   let transformsArray3: number[] = [];
   let transformsArray4: number[] = [];
-  let colorsArray: number[] = [];
 
   let numIter: number = 3;
-  let axiom: string = "F";
+  let axiom: string = "FF";
 
   let expansionRules: Map<string, ExpansionRule> = new Map();
-  expansionRules.set("F", new ExpansionRule("F", "FF"));
+  expansionRules.set("F", new ExpansionRule("F", "[F]+F"));
   // TODO create & populate these rules
 
   let drawingRules: Map<string, DrawingRule> = new Map();
   drawingRules.set("F", new DrawingRule("F", cylinder, () => {
-    let transform: mat4 = mat4.create();
-    let scale: vec3 = vec3.fromValues(1, 1, 1);
-    //mat4.fromRotationTranslation(transform, turtle.orientation, turtle.position);
-    mat4.fromRotationTranslationScale(transform, turtle.orientation, turtle.position, scale);
-
+    let transform: mat4 = turtle.getTransformation();
     transformsArray1.push(transform[0], transform[1], transform[2], transform[3]);
     transformsArray2.push(transform[4], transform[5], transform[6], transform[7]);
     transformsArray3.push(transform[8], transform[9], transform[10], transform[11]);
     transformsArray4.push(transform[12], transform[13], transform[14], transform[15]);
-
-    /*
-    colorsArray.push(1.0);
-    colorsArray.push(1.0);
-    colorsArray.push(1.0);
-    colorsArray.push(1.0);*/
   }));
   // TODO create & populate these rules
 
@@ -94,7 +83,7 @@ function loadLSystem() {
   console.log(axiom);
 
   let stack: Turtle[] = [];
-  let turtle: Turtle = new Turtle(vec3.fromValues(0, 0, 0), quat.fromValues(0, 0, 0, 1), 0);
+  let turtle: Turtle = new Turtle(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 0, 0), 0);
 
   // draw expanded symbols
   for (var i = 0; i < axiom.length; i++) {
@@ -102,7 +91,7 @@ function loadLSystem() {
 
     if (symbol == "[") {
       // push new Turtle to stack
-      let newTurtle: Turtle = new Turtle(turtle.position, turtle.orientation, turtle.depth + 1);
+      let newTurtle: Turtle = new Turtle(turtle.position, turtle.forward, turtle.up, turtle.right, turtle.depth + 1);
       stack.push(newTurtle);
       continue;
     } else if (symbol == "]") {
@@ -110,7 +99,9 @@ function loadLSystem() {
       turtle = stack.pop();
       continue;
     } else if (symbol == "F") {
-      turtle.moveForward();
+      turtle.moveUp();
+    } else if (symbol == "+") {
+      turtle.rotateRight(30);
     }
     // TODO other symbols modify turtle orientation and position
 
@@ -124,7 +115,6 @@ function loadLSystem() {
   let transforms2: Float32Array = new Float32Array(transformsArray2);
   let transforms3: Float32Array = new Float32Array(transformsArray3);
   let transforms4: Float32Array = new Float32Array(transformsArray4);
-  //let colors: Float32Array = new Float32Array(colorsArray);
 
   cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4);
   cylinder.setNumInstances(n);
@@ -191,12 +181,12 @@ function main() {
   //loadScene();
   loadLSystem();
 
-  const camera = new Camera(vec3.fromValues(10, 20, 10), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(10, 20, 10), vec3.fromValues(0, 5, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
+  //gl.enable(gl.BLEND);
+  //gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
 
   const instancedShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/instanced-vert.glsl')),

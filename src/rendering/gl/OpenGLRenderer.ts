@@ -40,7 +40,7 @@ class OpenGLRenderer {
     prog.setCameraAxes(axes);
 
     for (let drawable of drawables) {
-      console.log(drawable);
+      //console.log(drawable);
       prog.draw(drawable);
     }
   }
