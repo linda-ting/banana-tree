@@ -23,7 +23,6 @@ let cylinder: Cylinder;
 let time: number = 0.0;
 
 function loadLSystem() {
-  // create geometry
   cylinder = new Cylinder();
   cylinder.create();
   square = new Square();
@@ -39,10 +38,12 @@ function loadLSystem() {
   let transformsArray4: number[] = [];
 
   let numIter: number = 3;
-  let axiom: string = "FF";
+  let axiom: string = "FFFFA//[----FFC]///A";
 
   let expansionRules: Map<string, ExpansionRule> = new Map();
-  expansionRules.set("F", new ExpansionRule("F", "[F]+F"));
+  expansionRules.set("A", new ExpansionRule("A", "[-\\FAB]F[&//^&F++AB]"));
+  expansionRules.set("B", new ExpansionRule("B", "/D"));
+  expansionRules.set("D", new ExpansionRule("D", "//F/E")); // TODO these are the leaves
   // TODO create & populate these rules
 
   let drawingRules: Map<string, DrawingRule> = new Map();
@@ -53,6 +54,8 @@ function loadLSystem() {
     transformsArray3.push(transform[8], transform[9], transform[10], transform[11]);
     transformsArray4.push(transform[12], transform[13], transform[14], transform[15]);
   }));
+  // TODO "E" is for leaves
+  // TODO "C" is for bananas"
   // TODO create & populate these rules
 
   var expandedAxiom = "";
@@ -86,22 +89,41 @@ function loadLSystem() {
   let turtle: Turtle = new Turtle(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 0, 0), 0);
 
   // draw expanded symbols
+  let depth: number = 0;
   for (var i = 0; i < axiom.length; i++) {
     var symbol = axiom[i];
 
     if (symbol == "[") {
       // push new Turtle to stack
-      let newTurtle: Turtle = new Turtle(turtle.position, turtle.forward, turtle.up, turtle.right, turtle.depth + 1);
+      depth++;
+      let newTurtle: Turtle = new Turtle(vec3.clone(turtle.position), 
+                                         vec3.clone(turtle.forward), 
+                                         vec3.clone(turtle.up), 
+                                         vec3.clone(turtle.right), 
+                                         depth);
       stack.push(newTurtle);
       continue;
     } else if (symbol == "]") {
       // pop Turtle off of stack
+      depth--;
       turtle = stack.pop();
       continue;
     } else if (symbol == "F") {
       turtle.moveUp();
     } else if (symbol == "+") {
+      turtle.rotateForward(30);
+    } else if (symbol == "-") {
+      turtle.rotateForward(-30);
+    } else if (symbol == "&") {
       turtle.rotateRight(30);
+    } else if (symbol == "^") {
+      turtle.rotateRight(-30);
+    } else if (symbol == "\\") {
+      turtle.rotateUp(30);
+    } else if (symbol == "/") {
+      turtle.rotateUp(-30);
+    } else if (symbol == ".") {
+      // TODO draw leaf?
     }
     // TODO other symbols modify turtle orientation and position
 
@@ -181,7 +203,7 @@ function main() {
   //loadScene();
   loadLSystem();
 
-  const camera = new Camera(vec3.fromValues(10, 20, 10), vec3.fromValues(0, 5, 0));
+  const camera = new Camera(vec3.fromValues(20, 70, 20), vec3.fromValues(0, 6, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);

@@ -6,6 +6,9 @@ export default class Turtle {
   up: vec3 = vec3.create();
   right: vec3 = vec3.create();
   depth: number = 0;
+  thicknessScale: number = 0.7;
+  defaultAngle: number = 10;
+  defaultDist: number = 1.5;
 
   constructor(pos: vec3, forward: vec3, up: vec3, right: vec3, depth: number) {
     this.position = pos;
@@ -20,7 +23,7 @@ export default class Turtle {
 
     // scale
     let scale: mat4 = mat4.create();
-    let scaleFactor: number = Math.pow(0.5, this.depth);
+    let scaleFactor: number = Math.pow(this.thicknessScale, this.depth);
     mat4.scale(scale, scale, vec3.fromValues(scaleFactor, 1, scaleFactor));
 
     // rotate
@@ -41,19 +44,19 @@ export default class Turtle {
   }
 
   // moves turtle forward along current orientation
-  moveUp(dist: number = 1.0) {
+  moveUp(dist: number = this.defaultDist) {
     let delta: vec3 = vec3.create();
     vec3.scale(delta, this.up, dist);
     this.move(delta);
   }
 
-  moveForward(dist: number = 1.0) {
+  moveForward(dist: number = this.defaultDist) {
     let delta: vec3 = vec3.create();
     vec3.scale(delta, this.forward, dist);
     this.move(delta);
   }
 
-  moveRight(dist: number = 1.0) {
+  moveRight(dist: number = this.defaultDist) {
     let delta: vec3 = vec3.create();
     vec3.scale(delta, this.right, dist);
     this.move(delta);
@@ -64,7 +67,7 @@ export default class Turtle {
   }
 
   // rotate about up vec
-  rotateUp(angle: number) {
+  rotateUp(angle: number = this.defaultAngle) {
     let angleRad: number = angle * Math.PI / 180.0;
     let rotation: mat4 = mat4.create(); 
     mat4.fromRotation(rotation, angleRad, this.up);
@@ -72,7 +75,7 @@ export default class Turtle {
   }
 
   // rotate about forward vec
-  rotateForward(angle: number) {    
+  rotateForward(angle: number = this.defaultAngle) {    
     let angleRad: number = angle * Math.PI / 180.0;
     let rotation: mat4 = mat4.create(); 
     mat4.fromRotation(rotation, angleRad, this.forward);
@@ -80,7 +83,7 @@ export default class Turtle {
   }
 
   // rotate about right vec
-  rotateRight(angle: number) {
+  rotateRight(angle: number = this.defaultAngle) {
     let angleRad: number = angle * Math.PI / 180.0;
     let rotation: mat4 = mat4.create(); 
     mat4.fromRotation(rotation, angleRad, this.right);

@@ -8,8 +8,8 @@ class Cylinder extends Drawable {
   normals: Float32Array;
   colors: Float32Array;
   subdivisions: number = 12;
-  radius: number = 1.0;
-  height: number = 1.0;
+  radius: number = 0.5;
+  height: number = 1.5;
   transform1: Float32Array;
   transform2: Float32Array;
   transform3: Float32Array;
