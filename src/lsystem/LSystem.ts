@@ -97,6 +97,8 @@ export default class LSystem {
     this.numLeaf = 0;
     this.numBanana = 0;
 
+    // TODO fix smth with instance vbos (coloring) after resetting/redrawing
+
     this.cylTransfArrX = [];
     this.cylTransfArrY = [];
     this.cylTransfArrZ = [];
@@ -142,6 +144,7 @@ export default class LSystem {
     console.log(this.axiom);
   }
 
+  // draws l system after it has been expanded
   draw() {
     let stack: Turtle[] = [];
     this.turtle = new Turtle(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 0, 0), 0);
@@ -205,6 +208,29 @@ export default class LSystem {
     this.leaf.setNumInstances(this.numLeaf);
   }
 
-  // TODO helper functions to set certain params !
-  // will need to reset, expand, and draw l system
+  // something has been updated! re-expand the axiom and redraw
+  redraw() {
+    this.reset();
+    this.expand();
+    this.draw();
+  }
+
+  // set number of iterations
+  setNumIter(iter: number) {
+    this.numIter = iter;
+    this.redraw();
+  }
+
+  // set new axiom
+  setAxiom(axiom: string) {
+    this.axiom = axiom;
+    console.log("new axiom: " + this.axiom);
+    this.redraw();
+  }
+
+  // set default rotation angle
+  setAngle(angle: number) {
+    this.angle = angle;
+    this.redraw();
+  }
 }

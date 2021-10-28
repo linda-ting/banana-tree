@@ -14,6 +14,9 @@ import LSystem from './lsystem/LSystem'
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
+  numIter: 6,
+  axiom: "FFFFFFFA[///----FFF++++B]A///A////A///A//A",
+  angle: 20
 };
 
 let square: Square;
@@ -103,6 +106,20 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  const iterControl = gui.add(controls, 'numIter', 1, 10).step(1);
+  iterControl.onChange(function() {
+    lsystem.setAxiom(controls.axiom);
+    lsystem.setNumIter(controls.numIter);
+  });
+  const axiomControl = gui.add(controls, 'axiom');
+  axiomControl.onFinishChange(function() {
+    lsystem.setAxiom(controls.axiom);
+  });
+  const angleControl = gui.add(controls, 'angle');
+  angleControl.onFinishChange(function() {    
+    lsystem.setAxiom(controls.axiom);
+    lsystem.setAngle(controls.angle);
+  });
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
