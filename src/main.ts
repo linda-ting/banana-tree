@@ -15,7 +15,7 @@ import LSystem from './lsystem/LSystem'
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   numIter: 6,
-  axiom: "FFFFFFFA[///----FFF++++B]A///A////A///A//A",
+  axiom: "FFFFFFFFF^++A[//------FFF++++B]-&&A///^^^A++",
   angle: 20
 };
 
@@ -34,7 +34,6 @@ function readObj(filename: string) : string {
   client.onreadystatechange = function() {
     if(client.status === 200 || client.status == 0)
     {
-      //alert(client.responseText);
       outstr = client.responseText;
     }
   }
@@ -44,6 +43,9 @@ function readObj(filename: string) : string {
 
 function loadLSystem() {
   // TODO init banana obj from mesh
+  let bananaObjStr: string = readObj("./src/lsystem/obj/banana.obj");
+  banana = new Mesh(bananaObjStr, vec3.fromValues(0, 0, 0));
+  banana.create();
 
   let leafObjStr: string = readObj("./src/lsystem/obj/banana_leaf.obj");
   leaf = new Mesh(leafObjStr, vec3.fromValues(0, 0, 0));
@@ -51,18 +53,19 @@ function loadLSystem() {
 
   cylinder = new Cylinder();
   cylinder.create();
+  /*let cylObjStr: string = readObj("./src/lsystem/obj/cylinder.obj");
+  cylinder = new Mesh(cylObjStr, vec3.fromValues(0, 0, 0));
+  cylinder.create();*/
 
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  lsystem = new LSystem(cylinder, leaf, banana);
+  lsystem = new LSystem(cylinder, leaf, banana, controls.axiom, controls.angle, controls.numIter);
   lsystem.expand();
   lsystem.draw();
 }
 
 function loadScene() {
-  cylinder = new Cylinder();
-  cylinder.create();
   square = new Square();
   square.create();
   screenQuad = new ScreenQuad();
@@ -106,19 +109,22 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  const iterControl = gui.add(controls, 'numIter', 1, 10).step(1);
+  const iterControl = gui.add(controls, 'numIter', 1, 8).step(1);
   iterControl.onChange(function() {
     lsystem.setAxiom(controls.axiom);
     lsystem.setNumIter(controls.numIter);
+    lsystem.redraw();
   });
   const axiomControl = gui.add(controls, 'axiom');
   axiomControl.onFinishChange(function() {
     lsystem.setAxiom(controls.axiom);
+    lsystem.redraw();
   });
-  const angleControl = gui.add(controls, 'angle');
+  const angleControl = gui.add(controls, 'angle', 10, 30).step(1);
   angleControl.onFinishChange(function() {    
     lsystem.setAxiom(controls.axiom);
     lsystem.setAngle(controls.angle);
+    lsystem.redraw();
   });
 
   // get canvas and webgl context
@@ -160,7 +166,7 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [cylinder, leaf]);
+    renderer.render(camera, instancedShader, [cylinder, leaf, banana]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

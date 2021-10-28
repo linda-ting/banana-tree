@@ -1,4 +1,4 @@
-import { quat, vec3, mat4, vec4 } from 'gl-matrix';
+import { vec3, mat4, vec4 } from 'gl-matrix';
 
 export default class Turtle {
   position: vec3 = vec3.create();
@@ -6,9 +6,10 @@ export default class Turtle {
   up: vec3 = vec3.create();
   right: vec3 = vec3.create();
   depth: number = 0;
-  thicknessScale: number = 0.95;
-  defaultAngle: number = 10;
-  defaultDist: number = 1.5;
+  length: number = 0;
+  thicknessScale: number = 0.9;
+  defaultAngle: number = 20;
+  defaultDist: number = 2;
 
   constructor(pos: vec3, forward: vec3, up: vec3, right: vec3, depth: number) {
     this.position = pos;
@@ -23,7 +24,7 @@ export default class Turtle {
 
     // scale
     let scale: mat4 = mat4.create();
-    let scaleFactor: number = Math.pow(this.thicknessScale, this.depth);
+    let scaleFactor: number = Math.pow(this.thicknessScale, this.length);
     mat4.scale(scale, scale, vec3.fromValues(scaleFactor, 1, scaleFactor));
 
     // rotate
@@ -43,7 +44,28 @@ export default class Turtle {
     return transform;
   }
 
-  // moves turtle forward along current orientation
+  getTransformationNoScale() {
+    let transform: mat4 = mat4.create();
+    // rotate
+    let rotation: mat4 = mat4.create();
+    mat4.identity(rotation);
+    mat4.set(rotation, this.right[0], this.right[1], this.right[2], 0,
+                       this.up[0], this.up[1], this.up[2], 0,
+                       this.forward[0], this.forward[1], this.forward[2], 0,
+                       0, 0, 0, 1);
+
+    // translate
+    let translation: mat4 = mat4.create();
+    mat4.fromTranslation(translation, this.position);
+
+    mat4.multiply(transform, translation, rotation);
+    return transform;
+  }
+
+  setLength(len: number) {
+    this.length = len;
+  }
+
   moveUp(dist: number = this.defaultDist) {
     let delta: vec3 = vec3.create();
     vec3.scale(delta, this.up, dist);
@@ -73,6 +95,8 @@ export default class Turtle {
   // rotate about up vec
   rotateUp(angle: number = this.defaultAngle) {
     let angleRad: number = angle * Math.PI / 180.0;
+    // add some noise to angle
+    angleRad += (Math.random() - 0.5) * 0.02;
     let rotation: mat4 = mat4.create(); 
     mat4.fromRotation(rotation, angleRad, this.up);
     this.rotate(rotation);
@@ -81,6 +105,8 @@ export default class Turtle {
   // rotate about forward vec
   rotateForward(angle: number = this.defaultAngle) {    
     let angleRad: number = angle * Math.PI / 180.0;
+    // add some noise to angle
+    angleRad += (Math.random() - 0.5) * 0.02;
     let rotation: mat4 = mat4.create(); 
     mat4.fromRotation(rotation, angleRad, this.forward);
     this.rotate(rotation);
@@ -89,6 +115,8 @@ export default class Turtle {
   // rotate about right vec
   rotateRight(angle: number = this.defaultAngle) {
     let angleRad: number = angle * Math.PI / 180.0;
+    // add some noise to angle
+    angleRad += (Math.random() - 0.5) * 0.02;
     let rotation: mat4 = mat4.create(); 
     mat4.fromRotation(rotation, angleRad, this.right);
     this.rotate(rotation);
