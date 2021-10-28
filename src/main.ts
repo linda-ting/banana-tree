@@ -1,9 +1,10 @@
 import {mat4, quat, vec3} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
-import Square from './geometry/Square';
 import Cylinder from './geometry/Cylinder';
+import Mesh from './geometry/Mesh';
 import ScreenQuad from './geometry/ScreenQuad';
+import Square from './geometry/Square';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
@@ -20,9 +21,30 @@ const controls = {
 let square: Square;
 let screenQuad: ScreenQuad;
 let cylinder: Cylinder;
+let leaf: Mesh;
+let banana: Mesh;
 let time: number = 0.0;
 
+function readObj(filename: string) : string {
+  var outstr = "";
+  var client = new XMLHttpRequest();
+  client.open('GET', filename, false);
+  client.onreadystatechange = function() {
+    if(client.status === 200 || client.status == 0)
+    {
+      //alert(client.responseText);
+      outstr = client.responseText;
+    }
+  }
+  client.send(null);
+  return outstr;
+}
+
 function loadLSystem() {
+  let leafObjStr: string = readObj("./src/lsystem/obj/banana_leaf.obj");
+  leaf = new Mesh(leafObjStr, vec3.fromValues(0, 0, 0));
+  leaf.create();
+
   cylinder = new Cylinder();
   cylinder.create();
   square = new Square();
@@ -30,20 +52,28 @@ function loadLSystem() {
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
+  let angle: number = 20;
+
   // set up instanced rendering data arrays
-  let n: number = 0;
+  let numCyl: number = 0;
   let transformsArray1: number[] = [];
   let transformsArray2: number[] = [];
   let transformsArray3: number[] = [];
   let transformsArray4: number[] = [];
 
-  let numIter: number = 3;
-  let axiom: string = "FFFFA//[----FFC]///A";
+  let numLeaf: number = 0;
+  let leafTransfArray1: number[] = [];
+  let leafTransfArray2: number[] = [];
+  let leafTransfArray3: number[] = [];
+  let leafTransfArray4: number[] = [];
+
+  let numIter: number = 5;
+  let axiom: string = "FFFFFA//[----FFC]A///A////A///A";
 
   let expansionRules: Map<string, ExpansionRule> = new Map();
-  expansionRules.set("A", new ExpansionRule("A", "[-\\FAB]F[&//^&F++AB]"));
-  expansionRules.set("B", new ExpansionRule("B", "/D"));
-  expansionRules.set("D", new ExpansionRule("D", "//F/E")); // TODO these are the leaves
+  expansionRules.set("A", new ExpansionRule("A", "[F^//F/E][^///A]"));
+  //expansionRules.set("B", new ExpansionRule("B", "D"));
+  //expansionRules.set("D", new ExpansionRule("D", "//F/E")); // TODO these are the leaves
   // TODO create & populate these rules
 
   let drawingRules: Map<string, DrawingRule> = new Map();
@@ -53,8 +83,16 @@ function loadLSystem() {
     transformsArray2.push(transform[4], transform[5], transform[6], transform[7]);
     transformsArray3.push(transform[8], transform[9], transform[10], transform[11]);
     transformsArray4.push(transform[12], transform[13], transform[14], transform[15]);
+    numCyl++;
   }));
-  // TODO "E" is for leaves
+  drawingRules.set("E", new DrawingRule("E", leaf, () => {
+    let transform: mat4 = turtle.getTransformation();
+    leafTransfArray1.push(transform[0], transform[1], transform[2], transform[3]);
+    leafTransfArray2.push(transform[4], transform[5], transform[6], transform[7]);
+    leafTransfArray3.push(transform[8], transform[9], transform[10], transform[11]);
+    leafTransfArray4.push(transform[12], transform[13], transform[14], transform[15]);
+    numLeaf++;
+  }));
   // TODO "C" is for bananas"
   // TODO create & populate these rules
 
@@ -111,35 +149,38 @@ function loadLSystem() {
     } else if (symbol == "F") {
       turtle.moveUp();
     } else if (symbol == "+") {
-      turtle.rotateForward(30);
+      turtle.rotateForward(angle);
     } else if (symbol == "-") {
-      turtle.rotateForward(-30);
+      turtle.rotateForward(-angle);
     } else if (symbol == "&") {
-      turtle.rotateRight(30);
+      turtle.rotateRight(angle);
     } else if (symbol == "^") {
-      turtle.rotateRight(-30);
+      turtle.rotateRight(-angle);
     } else if (symbol == "\\") {
-      turtle.rotateUp(30);
+      turtle.rotateUp(angle);
     } else if (symbol == "/") {
-      turtle.rotateUp(-30);
-    } else if (symbol == ".") {
-      // TODO draw leaf?
+      turtle.rotateUp(-angle);
     }
-    // TODO other symbols modify turtle orientation and position
 
     let drawingRule = drawingRules.get(symbol);
     if (drawingRule == null) continue;
     drawingRule.draw();
-    n++;
   }
 
   let transforms1: Float32Array = new Float32Array(transformsArray1);
   let transforms2: Float32Array = new Float32Array(transformsArray2);
   let transforms3: Float32Array = new Float32Array(transformsArray3);
   let transforms4: Float32Array = new Float32Array(transformsArray4);
-
   cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4);
-  cylinder.setNumInstances(n);
+  cylinder.setNumInstances(numCyl);
+
+  let leafTransf1: Float32Array = new Float32Array(leafTransfArray1);
+  let leafTransf2: Float32Array = new Float32Array(leafTransfArray2);
+  let leafTransf3: Float32Array = new Float32Array(leafTransfArray3);
+  let leafTransf4: Float32Array = new Float32Array(leafTransfArray4);
+  leaf.setInstanceVBOs(leafTransf1, leafTransf2, leafTransf3, leafTransf4);
+  console.log(numLeaf);
+  leaf.setNumInstances(numLeaf);
 }
 
 function loadScene() {
@@ -229,7 +270,7 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     //renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [cylinder]);
+    renderer.render(camera, instancedShader, [cylinder, leaf]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

@@ -26,6 +26,6 @@ void main()
     mat4 transform = mat4(vs_Transform1, vs_Transform2, vs_Transform3, vs_Transform4);
     fs_Pos = transform * vs_Pos;
     fs_Nor = transform * vs_Nor;
-    fs_Col = vec4(0.8, 0.8, 0.8, 1.0);
+    fs_Col = vec4(fs_Nor.xyz, 1.0);
     gl_Position = u_ViewProj * fs_Pos;
 }
