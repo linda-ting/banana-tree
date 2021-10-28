@@ -23,6 +23,7 @@ class Cylinder extends Drawable {
     let indicesArray: Array<number> = [];
     let positionsArray: Array<number> = [];
     let normalsArray: Array<number> = [];
+    let vertOffset: number = 0;
 
     for (var i = 0; i < this.subdivisions; i++) {
       const theta = i * 2.0 * Math.PI / this.subdivisions;
@@ -42,6 +43,8 @@ class Cylinder extends Drawable {
       positionsArray.push(nextX, 0, nextZ, 1);
       positionsArray.push(nextX, -this.height, nextZ, 1);
 
+      vertOffset += 4;
+
       // calculate normals
       let normal: vec3 = vec3.create();
       vec3.normalize(normal, vec3.fromValues((x + nextX) / 2.0, 0, (z + nextZ) / 2.0));
@@ -53,6 +56,23 @@ class Cylinder extends Drawable {
       // write triangle indices
       indicesArray.push(4 * i, 4 * i + 3, 4 * i + 1);
       indicesArray.push(4 * i, 4 * i + 2, 4 * i + 3);
+    }
+
+    // add attributes for top and bottom
+    for (var i = 0; i < this.subdivisions; i++) {
+      const theta = i * 2.0 * Math.PI / this.subdivisions;
+      const x = this.radius * Math.cos(theta);
+      const z = this.radius * Math.sin(theta);
+      positionsArray.push(x, 0, z, 1);
+      positionsArray.push(x, -this.height, z, 1);
+
+      normalsArray.push(0, -1, 0, 0);
+      normalsArray.push(0, 1, 0, 0);
+
+      if (i >= 2 && i < this.subdivisions - 2) {
+        indicesArray.push(vertOffset, vertOffset + 2 * i, vertOffset + 2 * (i + 1));
+        indicesArray.push(vertOffset + 1, vertOffset + 2 * i + 1, vertOffset + 2 * (i + 1) + 1);
+      }
     }
 
     this.indices = new Uint32Array(indicesArray);
