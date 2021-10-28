@@ -3,12 +3,6 @@ export default class ExpansionRule {
   postcondition: string;
   postconditions: Map<number, string> = new Map();
 
-  /*
-  constructor(pre: string, post: string) {
-    this.precondition = pre;
-    this.postcondition = post;
-  }*/
-
   constructor(pre: string) {
     this.precondition = pre;
   }
@@ -18,8 +12,6 @@ export default class ExpansionRule {
   }
 
   expand() {
-    // TODO add randomness here! there can be multiple postconditions
-    //return this.postcondition;
     let num = Math.random();
     let prevThreshold = 0;
 
