@@ -50,6 +50,10 @@ export default class Turtle {
     this.move(delta);
   }
 
+  moveDown(dist: number = -this.defaultDist) {
+    this.moveUp(dist);
+  }
+
   moveForward(dist: number = this.defaultDist) {
     let delta: vec3 = vec3.create();
     vec3.scale(delta, this.forward, dist);

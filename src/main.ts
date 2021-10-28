@@ -40,12 +40,17 @@ function readObj(filename: string) : string {
 }
 
 function loadLSystem() {
+  // TODO init banana obj from mesh
+
   let leafObjStr: string = readObj("./src/lsystem/obj/banana_leaf.obj");
   leaf = new Mesh(leafObjStr, vec3.fromValues(0, 0, 0));
   leaf.create();
 
   cylinder = new Cylinder();
   cylinder.create();
+
+  screenQuad = new ScreenQuad();
+  screenQuad.create();
 
   lsystem = new LSystem(cylinder, leaf, banana);
   lsystem.expand();
@@ -108,7 +113,6 @@ function main() {
   // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
-
   gl.enable(gl.DEPTH_TEST);
 
   // Initial call to load scene
@@ -138,7 +142,7 @@ function main() {
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    //renderer.render(camera, flat, [screenQuad]);
+    renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [cylinder, leaf]);
     stats.end();
 

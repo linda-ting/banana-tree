@@ -6,8 +6,8 @@ import ExpansionRule from './ExpansionRule'
 import DrawingRule from './DrawingRule'
 
 export default class LSystem {
-  numIter: number = 5;
-  axiom: string = "FFFFFA//[----FFC]A///A////A///A";
+  numIter: number = 7;
+  axiom: string = "FFFFFFFA[///----FFF++++B]A///A////A///A//A";
   angle: number = 20;
   expansionRules: Map<string, ExpansionRule> = new Map();
   drawingRules: Map<String, DrawingRule> = new Map();
@@ -45,9 +45,11 @@ export default class LSystem {
   }
 
   init() {
-    this.expansionRules.set("A", new ExpansionRule("A", "[F^//F/E][^///A]"));
-    // TODO expansion rule to grow a bunch of bananas
+    this.expansionRules.set("A", new ExpansionRule("A", "[F^///---A][&\\++G]"));
+    this.expansionRules.set("G", new ExpansionRule("G", "+F+E"));
+    this.expansionRules.set("B", new ExpansionRule("B", "[^^C][^^--C][&&++C][///dB]&-C"));
 
+    // branch
     this.drawingRules.set("F", new DrawingRule("F", this.cylinder, () => {
       let transform: mat4 = this.turtle.getTransformation();
       this.cylTransfArrX.push(transform[0], transform[1], transform[2], transform[3]);
@@ -58,6 +60,7 @@ export default class LSystem {
       this.numCyl++;
     }));
 
+    // leaves
     this.drawingRules.set("E", new DrawingRule("E", this.leaf, () => {
       let transform: mat4 = this.turtle.getTransformation();
       this.leafTransfArrX.push(transform[0], transform[1], transform[2], transform[3]);
@@ -68,7 +71,25 @@ export default class LSystem {
       this.numLeaf++;
     }));
 
-    // TODO "C" is for drawing bananas
+    // CHANGE CYLINDER TO BANANA!!!
+    // banana
+    this.drawingRules.set("C", new DrawingRule("C", this.cylinder, () => {
+      let transform: mat4 = this.turtle.getTransformation();
+      this.cylTransfArrX.push(transform[0], transform[1], transform[2], transform[3]);
+      this.cylTransfArrY.push(transform[4], transform[5], transform[6], transform[7]);
+      this.cylTransfArrZ.push(transform[8], transform[9], transform[10], transform[11]);
+      this.cylTransfArrW.push(transform[12], transform[13], transform[14], transform[15]);
+      this.cylColorArr.push(0.9, 0.7, 0.1, 1);
+      this.numCyl++;
+      /*
+      this.banaTransfArrX.push(transform[0], transform[1], transform[2], transform[3]);
+      this.banaTransfArrY.push(transform[4], transform[5], transform[6], transform[7]);
+      this.banaTransfArrZ.push(transform[8], transform[9], transform[10], transform[11]);
+      this.banaTransfArrW.push(transform[12], transform[13], transform[14], transform[15]);
+      this.banaColorArr.push(0.9, 0.7, 0.1, 1);
+      this.numBanana++;
+      */
+    }));
   }
 
   reset() {
@@ -144,8 +165,10 @@ export default class LSystem {
         depth--;
         this.turtle = stack.pop();
         continue;
-      } else if (symbol == "F") {
+      } else if (symbol == "F" || symbol == "f") {
         this.turtle.moveUp();
+      } else if (symbol == "d") {
+        this.turtle.moveDown();
       } else if (symbol == "+") {
         this.turtle.rotateForward(this.angle);
       } else if (symbol == "-") {
@@ -165,20 +188,20 @@ export default class LSystem {
       drawingRule.draw();
     }
   
-    let transforms1: Float32Array = new Float32Array(this.cylTransfArrX);
-    let transforms2: Float32Array = new Float32Array(this.cylTransfArrY);
-    let transforms3: Float32Array = new Float32Array(this.cylTransfArrZ);
-    let transforms4: Float32Array = new Float32Array(this.cylTransfArrW);
+    let cylTransfX: Float32Array = new Float32Array(this.cylTransfArrX);
+    let cylTransfY: Float32Array = new Float32Array(this.cylTransfArrY);
+    let cylTransfZ: Float32Array = new Float32Array(this.cylTransfArrZ);
+    let cylTransfW: Float32Array = new Float32Array(this.cylTransfArrW);
     let cylColors: Float32Array = new Float32Array(this.cylColorArr);
-    this.cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4, cylColors);
+    this.cylinder.setInstanceVBOs(cylTransfX, cylTransfY, cylTransfZ, cylTransfW, cylColors);
     this.cylinder.setNumInstances(this.numCyl);
   
-    let leafTransf1: Float32Array = new Float32Array(this.leafTransfArrX);
-    let leafTransf2: Float32Array = new Float32Array(this.leafTransfArrY);
-    let leafTransf3: Float32Array = new Float32Array(this.leafTransfArrZ);
-    let leafTransf4: Float32Array = new Float32Array(this.leafTransfArrW);
+    let leafTransfX: Float32Array = new Float32Array(this.leafTransfArrX);
+    let leafTransfY: Float32Array = new Float32Array(this.leafTransfArrY);
+    let leafTransfZ: Float32Array = new Float32Array(this.leafTransfArrZ);
+    let leafTransfW: Float32Array = new Float32Array(this.leafTransfArrW);
     let leafColors: Float32Array = new Float32Array(this.leafColorArr);
-    this.leaf.setInstanceVBOs(leafTransf1, leafTransf2, leafTransf3, leafTransf4, leafColors);
+    this.leaf.setInstanceVBOs(leafTransfX, leafTransfY, leafTransfZ, leafTransfW, leafColors);
     this.leaf.setNumInstances(this.numLeaf);
   }
 

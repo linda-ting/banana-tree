@@ -21,7 +21,7 @@ out vec4 fs_Pos;
 out vec4 fs_Nor;
 out vec4 fs_LightVec;
 
-const vec4 lightPos = vec4(5, 5, 10, 1);
+const vec4 lightPos = vec4(5, 15, 10, 1);
 
 void main()
 {
