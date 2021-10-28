@@ -38,7 +38,7 @@ export default class LSystem {
   banaColorArr: number[] = [];
 
   constructor(cylinder: Cylinder, leaf: Mesh, banana: Mesh, 
-              axiom: string = "FFFFFFFFF^++A[//------FFF++++B]-&&A///^^^A++",
+              axiom: string = "FFFFFFFFF^++A[//------FF++++B]-&&A///^^^A++",
               angle: number = 20,
               numIter: number = 6) {
     this.cylinder = cylinder;
@@ -54,7 +54,7 @@ export default class LSystem {
   init() {
     let ruleA = new ExpansionRule("A");
     ruleA.addPostCondition(0.8, "[F^//---A][F&++G]");
-    ruleA.addPostCondition(0.15, "[F^---A][+FE]//G");
+    ruleA.addPostCondition(0.15, "[^++A]//G");
     ruleA.addPostCondition(0.05, "--F//A");
     this.expansionRules.set("A", ruleA);
 
@@ -74,7 +74,7 @@ export default class LSystem {
       this.cylTransfArrY.push(transform[4], transform[5], transform[6], transform[7]);
       this.cylTransfArrZ.push(transform[8], transform[9], transform[10], transform[11]);
       this.cylTransfArrW.push(transform[12], transform[13], transform[14], transform[15]);
-      this.cylColorArr.push(0.3, 0.2, 0.1, 1);
+      this.cylColorArr.push(0.8, 0.6, 0.3, 1);
       this.numCyl++;
     }));
 
@@ -174,7 +174,6 @@ export default class LSystem {
       this.axiom = expandedAxiom;
       expandedAxiom = "";
     }
-    console.log(this.axiom);
   }
 
   // draw l system

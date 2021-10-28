@@ -8,7 +8,7 @@ export default class Turtle {
   depth: number = 0;
   length: number = 0;
   thicknessScale: number = 0.9;
-  defaultAngle: number = 20;
+  defaultAngle: number = 17;
   defaultDist: number = 2;
 
   constructor(pos: vec3, forward: vec3, up: vec3, right: vec3, depth: number) {

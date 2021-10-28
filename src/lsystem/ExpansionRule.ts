@@ -29,7 +29,6 @@ export default class ExpansionRule {
 
       let thisThreshold = prevThreshold + prob;
       if (num >= prevThreshold && num < thisThreshold) {
-        console.log("num: " + num + " returning " + post + " with prob " + prob);
         return post;
       }
 

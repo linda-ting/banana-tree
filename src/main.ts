@@ -14,9 +14,9 @@ import LSystem from './lsystem/LSystem'
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  numIter: 6,
-  axiom: "FFFFFFFFF^++A[//------FFF++++B]-&&A///^^^A++",
-  angle: 20
+  numIter: 5,
+  axiom: "FFFFFFFFF^++A[//------FF++++B]-&&A///^^^A++",
+  angle: 16
 };
 
 let square: Square;
@@ -42,7 +42,6 @@ function readObj(filename: string) : string {
 }
 
 function loadLSystem() {
-  // TODO init banana obj from mesh
   let bananaObjStr: string = readObj("./src/lsystem/obj/banana.obj");
   banana = new Mesh(bananaObjStr, vec3.fromValues(0, 0, 0));
   banana.create();
@@ -53,9 +52,6 @@ function loadLSystem() {
 
   cylinder = new Cylinder();
   cylinder.create();
-  /*let cylObjStr: string = readObj("./src/lsystem/obj/cylinder.obj");
-  cylinder = new Mesh(cylObjStr, vec3.fromValues(0, 0, 0));
-  cylinder.create();*/
 
   screenQuad = new ScreenQuad();
   screenQuad.create();
@@ -109,17 +105,20 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+
   const iterControl = gui.add(controls, 'numIter', 1, 8).step(1);
   iterControl.onChange(function() {
     lsystem.setAxiom(controls.axiom);
     lsystem.setNumIter(controls.numIter);
     lsystem.redraw();
   });
+
   const axiomControl = gui.add(controls, 'axiom');
   axiomControl.onFinishChange(function() {
     lsystem.setAxiom(controls.axiom);
     lsystem.redraw();
   });
+
   const angleControl = gui.add(controls, 'angle', 10, 30).step(1);
   angleControl.onFinishChange(function() {    
     lsystem.setAxiom(controls.axiom);
@@ -142,7 +141,7 @@ function main() {
   //loadScene();
   loadLSystem();
 
-  const camera = new Camera(vec3.fromValues(20, 70, 20), vec3.fromValues(0, 6, 0));
+  const camera = new Camera(vec3.fromValues(0, 20, 40), vec3.fromValues(0, 18, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.9, 0.72, 0, 1);
