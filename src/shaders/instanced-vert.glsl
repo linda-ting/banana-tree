@@ -19,13 +19,19 @@ in vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to us
 out vec4 fs_Col;
 out vec4 fs_Pos;
 out vec4 fs_Nor;
+out vec4 fs_LightVec;
+
+const vec4 lightPos = vec4(5, 5, 10, 1);
 
 void main()
 {
-    // transform using input transformation
-    mat4 transform = mat4(vs_Transform1, vs_Transform2, vs_Transform3, vs_Transform4);
-    fs_Pos = transform * vs_Pos;
-    fs_Nor = transform * vs_Nor;
-    fs_Col = vec4(fs_Nor.xyz, 1.0);
-    gl_Position = u_ViewProj * fs_Pos;
+  // transform using input transformation
+  mat4 transform = mat4(vs_Transform1, vs_Transform2, vs_Transform3, vs_Transform4);
+  fs_Pos = transform * vs_Pos;
+  vec3 newNor = (transform * vs_Nor).xyz;
+  fs_Nor = vec4(normalize(newNor), 1);
+  fs_Col = vs_Col;
+  fs_LightVec = lightPos - fs_Pos;
+  
+  gl_Position = u_ViewProj * fs_Pos;
 }

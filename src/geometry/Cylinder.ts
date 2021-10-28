@@ -62,7 +62,7 @@ class Cylinder extends Drawable {
     this.generateIdx();
     this.generatePos();
     this.generateNor();
-    //this.generateCol();
+    this.generateCol();
     this.generateTransform1();
     this.generateTransform2();
     this.generateTransform3();
@@ -81,20 +81,13 @@ class Cylinder extends Drawable {
     console.log(`Created cylinder`);
   }
 
-  setInstanceVBOs(transform1: Float32Array, transform2: Float32Array, transform3: Float32Array, transform4: Float32Array) {
-    //this.colors = colors;
+  setInstanceVBOs(transform1: Float32Array, transform2: Float32Array, transform3: Float32Array, transform4: Float32Array, colors: Float32Array) {
     this.transform1 = transform1;
     this.transform2 = transform2;
     this.transform3 = transform3;
     this.transform4 = transform4;
+    this.colors = colors;
 
-    /*
-    // bind colors
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-*/
-
-    // bind transformation matrix data
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform1);
     gl.bufferData(gl.ARRAY_BUFFER, this.transform1, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform2);
@@ -103,6 +96,8 @@ class Cylinder extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.transform3, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform4);
     gl.bufferData(gl.ARRAY_BUFFER, this.transform4, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
   }
 };
 

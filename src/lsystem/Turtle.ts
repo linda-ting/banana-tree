@@ -6,7 +6,7 @@ export default class Turtle {
   up: vec3 = vec3.create();
   right: vec3 = vec3.create();
   depth: number = 0;
-  thicknessScale: number = 0.9;
+  thicknessScale: number = 0.95;
   defaultAngle: number = 10;
   defaultDist: number = 1.5;
 
@@ -24,7 +24,6 @@ export default class Turtle {
     // scale
     let scale: mat4 = mat4.create();
     let scaleFactor: number = Math.pow(this.thicknessScale, this.depth);
-    //mat4.scale(scale, scale, vec3.fromValues(scaleFactor, 1, scaleFactor));
     mat4.scale(scale, scale, vec3.fromValues(scaleFactor, 1, scaleFactor));
 
     // rotate

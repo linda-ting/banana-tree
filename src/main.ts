@@ -9,9 +9,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
-import Turtle from './lsystem/Turtle'
-import ExpansionRule from './lsystem/ExpansionRule'
-import DrawingRule from './lsystem/DrawingRule'
+import LSystem from './lsystem/LSystem'
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -23,6 +21,7 @@ let screenQuad: ScreenQuad;
 let cylinder: Cylinder;
 let leaf: Mesh;
 let banana: Mesh;
+let lsystem: LSystem;
 let time: number = 0.0;
 
 function readObj(filename: string) : string {
@@ -47,140 +46,10 @@ function loadLSystem() {
 
   cylinder = new Cylinder();
   cylinder.create();
-  square = new Square();
-  square.create();
-  screenQuad = new ScreenQuad();
-  screenQuad.create();
 
-  let angle: number = 20;
-
-  // set up instanced rendering data arrays
-  let numCyl: number = 0;
-  let transformsArray1: number[] = [];
-  let transformsArray2: number[] = [];
-  let transformsArray3: number[] = [];
-  let transformsArray4: number[] = [];
-
-  let numLeaf: number = 0;
-  let leafTransfArray1: number[] = [];
-  let leafTransfArray2: number[] = [];
-  let leafTransfArray3: number[] = [];
-  let leafTransfArray4: number[] = [];
-
-  let numIter: number = 5;
-  let axiom: string = "FFFFFA//[----FFC]A///A////A///A";
-
-  let expansionRules: Map<string, ExpansionRule> = new Map();
-  expansionRules.set("A", new ExpansionRule("A", "[F^//F/E][^///A]"));
-  //expansionRules.set("B", new ExpansionRule("B", "D"));
-  //expansionRules.set("D", new ExpansionRule("D", "//F/E")); // TODO these are the leaves
-  // TODO create & populate these rules
-
-  let drawingRules: Map<string, DrawingRule> = new Map();
-  drawingRules.set("F", new DrawingRule("F", cylinder, () => {
-    let transform: mat4 = turtle.getTransformation();
-    transformsArray1.push(transform[0], transform[1], transform[2], transform[3]);
-    transformsArray2.push(transform[4], transform[5], transform[6], transform[7]);
-    transformsArray3.push(transform[8], transform[9], transform[10], transform[11]);
-    transformsArray4.push(transform[12], transform[13], transform[14], transform[15]);
-    numCyl++;
-  }));
-  drawingRules.set("E", new DrawingRule("E", leaf, () => {
-    let transform: mat4 = turtle.getTransformation();
-    leafTransfArray1.push(transform[0], transform[1], transform[2], transform[3]);
-    leafTransfArray2.push(transform[4], transform[5], transform[6], transform[7]);
-    leafTransfArray3.push(transform[8], transform[9], transform[10], transform[11]);
-    leafTransfArray4.push(transform[12], transform[13], transform[14], transform[15]);
-    numLeaf++;
-  }));
-  // TODO "C" is for bananas"
-  // TODO create & populate these rules
-
-  var expandedAxiom = "";
-  for (var iter = 0; iter < numIter; iter++) {
-    for (var i = 0; i < axiom.length; i++) {
-      var symbol = axiom[i];
-
-      if (symbol == "[" || symbol == "]") {
-        expandedAxiom += symbol;
-        continue;
-      }
-
-      let expansionRule = expansionRules.get(symbol);
-      if (expansionRule) {
-        // if rule exists for this character, add expanded expression
-        var expandedSymbol = expansionRule.expand();
-        expandedAxiom += expandedSymbol;
-      } else {
-        // otherwise, leave as is
-        expandedAxiom += symbol;
-      }
-    }
-
-    // replace axiom
-    axiom = expandedAxiom;
-    expandedAxiom = "";
-  }
-  console.log(axiom);
-
-  let stack: Turtle[] = [];
-  let turtle: Turtle = new Turtle(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 0, 0), 0);
-
-  // draw expanded symbols
-  let depth: number = 0;
-  for (var i = 0; i < axiom.length; i++) {
-    var symbol = axiom[i];
-
-    if (symbol == "[") {
-      // push new Turtle to stack
-      depth++;
-      let newTurtle: Turtle = new Turtle(vec3.clone(turtle.position), 
-                                         vec3.clone(turtle.forward), 
-                                         vec3.clone(turtle.up), 
-                                         vec3.clone(turtle.right), 
-                                         depth);
-      stack.push(newTurtle);
-      continue;
-    } else if (symbol == "]") {
-      // pop Turtle off of stack
-      depth--;
-      turtle = stack.pop();
-      continue;
-    } else if (symbol == "F") {
-      turtle.moveUp();
-    } else if (symbol == "+") {
-      turtle.rotateForward(angle);
-    } else if (symbol == "-") {
-      turtle.rotateForward(-angle);
-    } else if (symbol == "&") {
-      turtle.rotateRight(angle);
-    } else if (symbol == "^") {
-      turtle.rotateRight(-angle);
-    } else if (symbol == "\\") {
-      turtle.rotateUp(angle);
-    } else if (symbol == "/") {
-      turtle.rotateUp(-angle);
-    }
-
-    let drawingRule = drawingRules.get(symbol);
-    if (drawingRule == null) continue;
-    drawingRule.draw();
-  }
-
-  let transforms1: Float32Array = new Float32Array(transformsArray1);
-  let transforms2: Float32Array = new Float32Array(transformsArray2);
-  let transforms3: Float32Array = new Float32Array(transformsArray3);
-  let transforms4: Float32Array = new Float32Array(transformsArray4);
-  cylinder.setInstanceVBOs(transforms1, transforms2, transforms3, transforms4);
-  cylinder.setNumInstances(numCyl);
-
-  let leafTransf1: Float32Array = new Float32Array(leafTransfArray1);
-  let leafTransf2: Float32Array = new Float32Array(leafTransfArray2);
-  let leafTransf3: Float32Array = new Float32Array(leafTransfArray3);
-  let leafTransf4: Float32Array = new Float32Array(leafTransfArray4);
-  leaf.setInstanceVBOs(leafTransf1, leafTransf2, leafTransf3, leafTransf4);
-  console.log(numLeaf);
-  leaf.setNumInstances(numLeaf);
+  lsystem = new LSystem(cylinder, leaf, banana);
+  lsystem.expand();
+  lsystem.draw();
 }
 
 function loadScene() {
@@ -240,6 +109,8 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
+  gl.enable(gl.DEPTH_TEST);
+
   // Initial call to load scene
   //loadScene();
   loadLSystem();
@@ -247,9 +118,7 @@ function main() {
   const camera = new Camera(vec3.fromValues(20, 70, 20), vec3.fromValues(0, 6, 0));
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  //gl.enable(gl.BLEND);
-  //gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
+  renderer.setClearColor(0.9, 0.72, 0, 1);
 
   const instancedShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/instanced-vert.glsl')),

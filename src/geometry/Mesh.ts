@@ -87,13 +87,13 @@ class Mesh extends Drawable {
     this.objString = ""; // hacky clear
   }
 
-  setInstanceVBOs(transform1: Float32Array, transform2: Float32Array, transform3: Float32Array, transform4: Float32Array) {
+  setInstanceVBOs(transform1: Float32Array, transform2: Float32Array, transform3: Float32Array, transform4: Float32Array, colors: Float32Array) {
     this.transform1 = transform1;
     this.transform2 = transform2;
     this.transform3 = transform3;
     this.transform4 = transform4;
+    this.colors = colors;
 
-    // bind transformation matrix data
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform1);
     gl.bufferData(gl.ARRAY_BUFFER, this.transform1, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform2);
@@ -102,6 +102,8 @@ class Mesh extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.transform3, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransform4);
     gl.bufferData(gl.ARRAY_BUFFER, this.transform4, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
   }
 };
 
