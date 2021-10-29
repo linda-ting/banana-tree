@@ -42,11 +42,11 @@ function readObj(filename: string) : string {
 }
 
 function loadLSystem() {
-  let bananaObjStr: string = readObj("./obj/banana.obj");
+  let bananaObjStr: string = readObj("./banana.obj");
   banana = new Mesh(bananaObjStr, vec3.fromValues(0, 0, 0));
   banana.create();
 
-  let leafObjStr: string = readObj("./obj/banana_leaf.obj");
+  let leafObjStr: string = readObj("./banana_leaf.obj");
   leaf = new Mesh(leafObjStr, vec3.fromValues(0, 0, 0));
   leaf.create();
 
