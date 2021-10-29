@@ -6097,10 +6097,10 @@ function readObj(filename) {
     return outstr;
 }
 function loadLSystem() {
-    let bananaObjStr = readObj("./obj/banana.obj");
+    let bananaObjStr = readObj("./banana.obj");
     banana = new __WEBPACK_IMPORTED_MODULE_4__geometry_Mesh__["a" /* default */](bananaObjStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0));
     banana.create();
-    let leafObjStr = readObj("./obj/banana_leaf.obj");
+    let leafObjStr = readObj("./banana_leaf.obj");
     leaf = new __WEBPACK_IMPORTED_MODULE_4__geometry_Mesh__["a" /* default */](leafObjStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0));
     leaf.create();
     cylinder = new __WEBPACK_IMPORTED_MODULE_3__geometry_Cylinder__["a" /* default */]();
