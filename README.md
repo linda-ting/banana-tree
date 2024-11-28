@@ -2,7 +2,7 @@
 
 Linda Ting (lstting)
 
-Demo [here](https://linda-ting.github.io/hw04-l-systems/)
+Demo [here](https://linda-ting.github.io/banana-tree/)
 
 ## Demo
 The final modeled plant is a banana tree!
